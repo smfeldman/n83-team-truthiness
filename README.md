@@ -13,6 +13,7 @@ Since team members will be distributed and have varying amounts of time availabl
 we will likely be working mostly separately on individual sub-projects.
 
 These might incude:
+- Develop an IPv6 addressing plan
 - Configure IPv6 interfaces and/or routing
 - Use GNMI/pygnmi to configure virtual routers
 - Use ansible and/or nornir to configure virtual routers
