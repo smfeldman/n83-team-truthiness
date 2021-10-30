@@ -36,3 +36,4 @@ Ground rules:
 (We have a Slack channel which can be used for this.)  This includes making any changes to
 the underlying virtual environment.
 - Save your work often, in case we're not perfect about following the previous rule!
+- All work is released under the [MIT license](LICENSE) and subject to the [Hackathon terms and conditions](https://www.nanog.org/legal/hackathon-terms/).
