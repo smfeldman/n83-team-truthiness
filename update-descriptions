@@ -1,0 +1,83 @@
+#!/usr/bin/env python3
+
+import click
+import ipaddress
+
+from pygnmi.client import gNMIclient
+from pynautobot import api
+from pprint import pprint
+
+# don't do this!
+
+NB_URL =   'http://172.22.0.8:8000'
+NB_TOKEN = '5699d9f4e84fb2dd32f4c37789da5592306fe84a'
+
+def check_descriptions(device, descriptions, verbose=False):
+    if verbose:
+        print("check_descriptions({}, {})".format(device, descriptions))
+    with gNMIclient(target=(device, 6030), username='admin', password='admin', insecure=True) as gc:
+        for interface, description in descriptions.items():
+            if verbose:
+                print(f"  check {interface} '{description}':")
+            result = gc.get(path=[f"/interfaces/interface[name={interface}]/config"])
+            if verbose:
+                pprint(result)
+            if 'openconfig-interfaces:description' in result['notification'][0]['update'][0]['val']:
+                current_desc = result['notification'][0]['update'][0]['val']['openconfig-interfaces:description']
+            else:
+                current_desc = ''
+            if description != current_desc:
+                print("  update interface {} to '{}'".format(interface, description))
+                update = [
+                    (
+                        f"openconfig-interfaces:interfaces/interface[name={interface}]",
+                        {
+                            "config": {
+                                "description": description
+                            }
+                        }
+                    )
+                ]
+                result = gc.set(update=update, encoding='json_ietf')
+            else:
+                print("  no update: interface {} is '{}'".format(interface, description))
+
+@click.command()
+@click.option('-v', '--verbose', is_flag=True)
+def main(verbose):
+    nb = api(url=NB_URL, token=NB_TOKEN)
+
+    version = nb.version
+    print(f"Nautobot version {version}")
+
+    query = """
+{
+  devices(platform: "eos", status: "active") {
+    name
+    primary_ip4 {
+      address
+    }
+    interfaces {
+      name
+      description
+    }
+  }
+}
+"""
+    result = nb.graphql.query(query=query)
+    if verbose:
+        print("GraphQL result:")
+        pprint(result.json)
+    for device in result.json['data']['devices']:
+        print("Updating {}".format(device['name']))
+        descriptions= {}
+        for interface in device['interfaces']:
+            pprint(interface)
+            descriptions[interface['name']] = interface['description']
+        #check_descriptions(device['name'], descriptions, verbose)
+        device_ip = str(ipaddress.ip_interface(device['primary_ip4']['address']).ip)
+        check_descriptions(device_ip, descriptions, verbose)
+
+
+if __name__ == '__main__':
+    main()
