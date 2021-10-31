@@ -13,10 +13,10 @@ Since team members will be distributed and have varying amounts of time availabl
 we will likely be working mostly separately on individual sub-projects.
 
 These might incude:
-- Develop an IPv6 addressing plan - DONE
-- Configure IPv6 interfaces and/or routing
+- Develop an IPv6 addressing plan - DONE - SF
+- Configure IPv6 interfaces and/or routing - in progress (with ansible) - SF
 - Use GNMI/pygnmi to configure virtual routers
-- Use ansible and/or nornir to configure virtual routers
+- Use ansible and/or nornir to configure virtual routers - in progress (with ansible) - SF
 - Webhook receiver to push changes from Nautobot on demand
 - Use other vendor images (subject to licensing restrictions)
 - Anything else even vaguely related that sounds interesting!
